@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  * Servlet implementation class FirstServlet
  */
 @WebServlet("/FirstServlet")
-public class FirstServlet extends HttpServlet {
+public class PrimaryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	public static final String HTML_START="<html><body>";
@@ -24,7 +24,7 @@ public class FirstServlet extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public FirstServlet() {
+    public PrimaryServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -37,6 +37,12 @@ public class FirstServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		Date date = new Date();
 		out.println(date.toString());
+		
+		ServerProcess p1 = new ServerProcess("1");
+		ServerProcess p2 = new ServerProcess("2");
+		ServerProcess p3 = new ServerProcess("3");
+		
+		
 	}
 
 	/**

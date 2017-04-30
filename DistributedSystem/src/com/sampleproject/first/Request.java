@@ -3,6 +3,9 @@ package com.sampleproject.first;
 import java.sql.Time;
 
 public class Request {
+	public static enum RequestStates{notfinished, finished};
+	public static enum RequestTypes{register, showProducts, buy};
+	
 	//the status of request finished or not
 	private String status;
 	
@@ -15,6 +18,9 @@ public class Request {
 	
 	//the owner of request who is responsible to do it
 	private ServerProcess owner;
+	
+	//request response
+	private String response;
 	
 	public Request()
 	{
