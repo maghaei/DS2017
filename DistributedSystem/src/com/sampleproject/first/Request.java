@@ -1,17 +1,14 @@
 package com.sampleproject.first;
 
-import java.sql.Time;
 
 public class Request {
-	public static enum RequestStates{notfinished, finished};
-	public static enum RequestTypes{register, showProducts, buy};
 	
 	//the status of request finished or not
 	private String status;
 	
 	//start and end time of request
-	private Time startTime;
-	private Time finishTime;
+	private long startTime;
+	private long finishTime;
 	
 	//request type
 	private String type;
@@ -26,7 +23,7 @@ public class Request {
 	{
 		
 	}
-	public Request(String reqType, Time start, ServerProcess reqOwner)
+	public Request(String reqType, long start, ServerProcess reqOwner)
 	{
 		type = reqType;
 		startTime = start;
@@ -34,12 +31,12 @@ public class Request {
 	}
 	
 	public String getStatus(){return status;}
-	public Time getStartTime(){return startTime;}
-	public Time getFinishTime(){return finishTime;}
+	public long getStartTime(){return startTime;}
+	public long getFinishTime(){return finishTime;}
 	public String getType(){return type;}
 	
 	public void setStatus(String state){status = state;}
-	public void setFinishTime(Time time){finishTime = time;}
+	public void setFinishTime(long time){finishTime = time;}
 	public void setOwner(ServerProcess process) {owner = process;}
 	public void setType(String reqType){type = reqType;}
 }

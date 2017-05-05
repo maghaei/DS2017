@@ -1,13 +1,20 @@
 package com.sampleproject.first;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class ServerProcess extends Thread{
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class ServerProcess{
 	
-	public enum States{idle,busy};
+	private int MAX_REQUEST_NUMBER = 5;
 	
 	//each server has its own id
-	private String serverID;
+	private int serverID;
 	
 	//a queue of requests that each server has to do 
 	private ArrayList<Request> requests;
@@ -17,49 +24,85 @@ public class ServerProcess extends Thread{
 	
 	public ServerProcess()
 	{
-		requests = new ArrayList<Request>();
 	}
 	
-	public ServerProcess(String id)
+	public ServerProcess(int id)
 	{
 		serverID = id;
-		requests = new ArrayList<Request>();
+		status = "idle";
+		requests = new ArrayList<>();
 	}
 	
-	public String getID(){return serverID;}
-	public void setID(String id){serverID = id;}
+	public int getID(){return serverID;}
+	public ArrayList<Request> getRequests(){return requests;}
+	public int getRequestsCount(){return requests.size();}
 	
-	@Override
-	public void run()
+
+	public String run()
 	{
-		while (true)
+		String msg = "";
+		if (requests.size() <= MAX_REQUEST_NUMBER)
 		{
 			if (requests.size() > 0)
 			{
-				status = "busy";
+				status = "serving";
 				Request req = requests.get(0);
 				switch (req.getType())
 				{
-					case "register": register();
+					case "register": msg = registerUser(req);
 						break;
-					case "show": showAvailableItems();
+					case "show": msg = showAvailableItems(req);
 						break;
-					case "buy": buy();
+					case "buy": msg = buy(req);
 						break;
 				}
-				if (req.getStatus().equals("finished")) requests.remove(0);
+				//requests.remove(req);
 			}
 			else
 			{
 				status = "idle";
 			}
 		}
+		else status = "busy";
+			return msg;
 	}
 	
-	private void register()
-	{}
-	private void showAvailableItems()
-	{}
-	private void buy()
-	{}
+	private String registerUser(Request r)
+	{
+		//System.out.println("You are registerd as a new user.");
+		r.setFinishTime(System.currentTimeMillis());
+		r.setStatus("finished");
+		return "<html><body><h3>You are registerd as a new user</h3></body></html>";
+	}
+	private String showAvailableItems(Request r)
+	{
+		String[] items = {"Laptop", "smart phone", "notebook", "tablet"};
+		String str = "";
+		for (String item : items)
+		{
+			str += item + "<br/>";
+			System.out.println(item);
+		}
+		r.setFinishTime(System.currentTimeMillis());
+		r.setStatus("finished");
+		String msg = "<html><body><h3>" + str + "</h3></body></html>";
+		return msg;
+	}
+	private String buy(Request r)
+	{
+		//System.out.println("the item will be deliverd you");
+		r.setFinishTime(System.currentTimeMillis());
+		r.setStatus("finished");
+		return "<html><body><h3>the item will be deliverd you</h3></body></html>";
+	}
+	
+	public void addRequest(Request r)
+	{
+		requests.add(r);
+	}
+	public boolean isServerBusy()
+	{
+		if (status.equals("busy")) return true;
+		else return false;
+	}
 }
