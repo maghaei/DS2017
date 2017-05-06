@@ -94,12 +94,10 @@ public class ServerProcess{
 		iterate();
 		String[] items = {"Laptop", "smart phone", "notebook", "tablet"};
 		String str = "Current available Products:<br/>";
-		iterate();
 		for (String item : items)
 		{
 			str += item + "<br/>";
 		}
-		iterate();
 		r.setFinishTime(System.currentTimeMillis());
 		r.setStatus("finished");
 		String elapsedTime = "Request start time: " + r.getStartTime() + " --- " + " Request finish time: " + r.getFinishTime();
@@ -110,7 +108,6 @@ public class ServerProcess{
 	}
 	private String buy(Request r)
 	{
-		iterate();
 		iterate();
 		r.setFinishTime(System.currentTimeMillis());
 		r.setStatus("finished");
@@ -133,7 +130,7 @@ public class ServerProcess{
 	private void iterate()
 	{
 		Random rand = new Random();
-		MAX_ITERATION_TIMES = rand.nextInt(10000)+1000;
+		MAX_ITERATION_TIMES = rand.nextInt(15000)+5000;
 		long j = 0;
 		for (int i=0; i<MAX_ITERATION_TIMES; i++)
 		{

@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -47,43 +53,85 @@ public class PrimaryServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		PrintWriter p = response.getWriter();
+		final PrintWriter p = response.getWriter();
 		
-		String func = request.getParameter("radio").toLowerCase();
-		String result = dispatchRequests(func);
-		p.println(result);
+		final String func = request.getParameter("radio").toLowerCase();
+		
+		ExecutorService executor = Executors.newFixedThreadPool(1);
+		Future<?> future = executor.submit(new Runnable(){
+			@Override 
+			public void run()
+			{
+				String msg = "";
+				ServerProcess sp = selectProperServer();
+				Request r = bindRequest(func, sp);
+				msg = sp.run(r);
+				p.println(msg);
+			}});
+		executor.shutdown();
+		try {
+	        future.get(100, TimeUnit.MILLISECONDS);  //     <-- wait 8 seconds to finish
+	    } catch (InterruptedException e) {    //     <-- possible error cases
+	        System.out.println("job was interrupted");
+	    } catch (ExecutionException e) {
+	        System.out.println("caught exception: " + e.getCause());
+	    } catch (TimeoutException e) {
+	        future.cancel(true);              //     <-- interrupt the job
+	        System.out.println("server maybe crashed due to request timeout! the request will be send to another server");
+	        ExecutorService executor1 = Executors.newFixedThreadPool(1);
+			Future<?> future1 = executor1.submit(new Runnable(){
+				@Override 
+				public void run()
+				{
+					String msg = "";
+					ServerProcess sp = selectProperServer();
+					Request r = bindRequest(func, sp);
+					msg = sp.run(r);
+					p.println(msg);
+				}});
+			executor.shutdown();
+			try {
+		        future1.get(100, TimeUnit.MILLISECONDS);  //     <-- wait 8 seconds to finish
+		    } catch (InterruptedException e1) {    //     <-- possible error cases
+		        System.out.println("job was interrupted");
+		    } catch (ExecutionException e1) {
+		        System.out.println("caught exception: " + e1.getCause());
+		    } catch (TimeoutException e1) {
+		        future.cancel(true);              //     <-- interrupt the job
+		        System.out.println("All servers are busy right now. Please try another time.");
+		    }
+	    }
 	}
-	private String dispatchRequests(String requestType)
+	/*private String dispatchRequests(final String requestType)
 	{
-		String msg = "";
-		ServerProcess sp = selectProperServer();
-		Request r = bindRequest(requestType, sp);
-		msg = sp.run(r);
-		
-		/*switch (requestType)
-		{
-		case "register": 
-			bindRequest(requestType, sp);
-			if (!sp.isServerBusy()) msg = sp.run();
-			else msg = "<html> server " + sp.getID() + " is busy with so many registers" + "</html>";
-			break;
-		case "show": 
-			
-			if (!sp.isServerBusy()) msg = sp.run();
-			else msg = "<html> server " + sp.getID() + " is busy with so many show requests" + "</html>";
-			break;
-		case "buy": 
-			Request r3 = new Request("buy", System.currentTimeMillis(), sp);
-			sp.addRequest(r3);
-			if (!sp.isServerBusy()) msg = sp.run();
-			else msg = "<html> server " + sp.getID() + " is busy with so many buy requests" + "</html>";
-			break;
-		}
-		*/
-		return msg;
+		ExecutorService executor = Executors.newFixedThreadPool(2);
+		Future<?> future = executor.submit(new Runnable(){
+			@Override 
+			public void run()
+			{
+				String msg = "";
+				ServerProcess sp = selectProperServer();
+				Request r = bindRequest(requestType, sp);
+				msg = sp.run(r);
+				p.println(msg);
+			}	
+			});
+		executor.shutdown();
+		try {
+	        future.get(100, TimeUnit.MILLISECONDS);  //     <-- wait 8 seconds to finish
+	    } catch (InterruptedException e) {    //     <-- possible error cases
+	        System.out.println("job was interrupted");
+	    } catch (ExecutionException e) {
+	        System.out.println("caught exception: " + e.getCause());
+	    } catch (TimeoutException e) {
+	        future.cancel(true);              //     <-- interrupt the job
+	        System.out.println("server maybe crashed due to request timeout!");
+	    }
+		return "";
 	}
+	*/
 	
 	private ServerProcess selectProperServer()
 	{
