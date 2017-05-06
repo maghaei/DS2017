@@ -25,8 +25,10 @@ public class Request {
 	}
 	public Request(String reqType, long start, ServerProcess reqOwner)
 	{
+		status = "unfinished";
 		type = reqType;
 		startTime = start;
+		finishTime = 0;
 		owner = reqOwner;
 	}
 	
