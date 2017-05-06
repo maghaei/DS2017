@@ -72,7 +72,7 @@ public class PrimaryServlet extends HttpServlet {
 			}});
 		executor.shutdown();
 		try {
-	        future.get(100, TimeUnit.MILLISECONDS);  //     <-- wait 8 seconds to finish
+	        future.get(100, TimeUnit.MILLISECONDS);  //     <-- wait 100 milliseconds to finish
 	    } catch (InterruptedException e) {    //     <-- possible error cases
 	        System.out.println("job was interrupted");
 	    } catch (ExecutionException e) {
@@ -93,7 +93,7 @@ public class PrimaryServlet extends HttpServlet {
 				}});
 			executor.shutdown();
 			try {
-		        future1.get(100, TimeUnit.MILLISECONDS);  //     <-- wait 8 seconds to finish
+		        future1.get(100, TimeUnit.MILLISECONDS);  //     <-- wait 100 milliseconds to finish
 		    } catch (InterruptedException e1) {    //     <-- possible error cases
 		        System.out.println("job was interrupted");
 		    } catch (ExecutionException e1) {
